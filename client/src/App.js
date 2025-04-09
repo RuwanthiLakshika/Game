@@ -1,9 +1,11 @@
 import WelcomePage from "./components/WelcomePage";
 import Login from "./components/Login";
 import SignUp from "./components/SignUp";
+import JoinGame from "./components/JoinGame";
 import { StreamChat } from "stream-chat";
 import Cookies from "universal-cookie";
 import { useEffect, useState } from "react";
+import { Chat } from "stream-chat-react";
 
 function App() {
   const api_key = "pnb3nxxeurye";
@@ -45,7 +47,10 @@ function App() {
   return (
     <div className="App">
     {isAuth ? (
-      <button onClick={logOut}> Log Out</button>
+       <Chat client={client}>
+       <JoinGame />
+       <button onClick={logOut}> Log Out</button>
+     </Chat>
     ) : (
       <>
         {currentPage === "welcome" && <WelcomePage onNavigate={setCurrentPage} />}
