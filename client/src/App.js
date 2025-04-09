@@ -1,9 +1,9 @@
-import './App.css';
-import SignUp from './components/SignUp';
-import Login from './components/Login';
+import WelcomePage from "./components/WelcomePage";
+import Login from "./components/Login";
+import SignUp from "./components/SignUp";
 import { StreamChat } from "stream-chat";
 import Cookies from "universal-cookie";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function App() {
   const api_key = "pnb3nxxeurye";
@@ -11,6 +11,7 @@ function App() {
   const token = cookies.get("token");
   const client = StreamChat.getInstance(api_key);
   const [isAuth, setIsAuth] = useState(false);
+  const [currentPage, setCurrentPage] = useState("welcome");
 
   const logOut = () => {
     cookies.remove("token");
@@ -43,15 +44,16 @@ function App() {
 
   return (
     <div className="App">
-       {isAuth ? (
-         <button onClick={logOut}> Log Out</button>
-      ) : (
-        <>
-          <SignUp setIsAuth={setIsAuth} />
-          <Login setIsAuth={setIsAuth} />
-        </>
-      )}
-    </div>
+    {isAuth ? (
+      <button onClick={logOut}> Log Out</button>
+    ) : (
+      <>
+        {currentPage === "welcome" && <WelcomePage onNavigate={setCurrentPage} />}
+        {currentPage === "login" && <Login setIsAuth={setIsAuth} onNavigate={setCurrentPage} />}
+        {currentPage === "signup" && <SignUp setIsAuth={setIsAuth} onNavigate={setCurrentPage} />}
+      </>
+    )}
+  </div>
   );
 }
 
