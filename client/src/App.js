@@ -4,11 +4,11 @@ import SignUp from "./components/SignUp";
 import JoinGame from "./components/JoinGame";
 import { StreamChat } from "stream-chat";
 import Cookies from "universal-cookie";
-import { useEffect, useState } from "react";
+import {useState } from "react";
 import { Chat } from "stream-chat-react";
 
 function App() {
-  const api_key = "pnb3nxxeurye";
+  const api_key = process.env.REACT_APP_STREAM_API_KEY;
   const cookies = new Cookies();
   const token = cookies.get("token");
   const client = StreamChat.getInstance(api_key);

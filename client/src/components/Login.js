@@ -225,7 +225,7 @@ function Login({ setIsAuth, onLoginSuccess, onNavigate }) {
             color: '#D1D5DB',
           }}>
             <span>Don't have an account? </span>
-            <a 
+            <a
               onClick={(e) => {
                 e.preventDefault(); 
                 onNavigate('signup');
