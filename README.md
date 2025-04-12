@@ -17,7 +17,11 @@ This project will build a multiplayer snake game where players can chat between 
 
 ![image](https://github.com/user-attachments/assets/ebda6309-7fca-4400-8b4b-523ace20024c)
 
-![image](https://github.com/user-attachments/assets/ff754200-2f44-40ae-a43c-1a323f3d6814)
+![image](https://github.com/user-attachments/assets/ff754200-2f44-40ae-a43c-1a323f3d6814)  
+
+![image](https://github.com/user-attachments/assets/6f81959c-4a77-461d-82ac-61530596adc8)
+
+![image](https://github.com/user-attachments/assets/d2e7b6f9-e6c1-44db-bdc9-9258e0809f89)
 
 ![image](https://github.com/user-attachments/assets/6fd75e7e-56b3-4be6-9cf7-3fa2471aa353)  
 
