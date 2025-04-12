@@ -4,9 +4,8 @@ import { useChannelStateContext, useChatContext } from "stream-chat-react";
 const GRID_SIZE = 20;
 const CELL_SIZE = 20;
 const INITIAL_SPEED = 150;
-const COUNTDOWN_SECONDS = 3; // Countdown duration in seconds
+const COUNTDOWN_SECONDS = 3; 
 
-// Direction constants
 const DIRECTIONS = {
   UP: { x: 0, y: -1 },
   DOWN: { x: 0, y: 1 },
@@ -14,7 +13,6 @@ const DIRECTIONS = {
   RIGHT: { x: 1, y: 0 }
 };
 
-// Event types (using underscores instead of dots)
 const EVENTS = {
   MOVE: 'game_move',
   FOOD: 'game_food',
@@ -22,7 +20,6 @@ const EVENTS = {
   START_COUNTDOWN: 'game_start_countdown'
 };
 
-// CSS styles as a JavaScript object
 const styles = {
   boardContainer: {
     display: 'flex',
@@ -130,23 +127,19 @@ const styles = {
 };
 
 const Board = () => {
-  // Get channel and client from Stream Chat context
   const { channel } = useChannelStateContext();
   const { client } = useChatContext();
   
-  // Player identifiers
   const [playerId, setPlayerId] = useState(null);
   const [isPlayer1, setIsPlayer1] = useState(false);
-  
-  // Game state
+
   const [playersReady, setPlayersReady] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [winner, setWinner] = useState(null);
   const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
   const [countdownActive, setCountdownActive] = useState(false);
-  
-  // Snake 1 state (player 1)
+ 
   const [snake1, setSnake1] = useState([
     { x: 3, y: 10 },
     { x: 2, y: 10 },
@@ -154,8 +147,7 @@ const Board = () => {
   ]);
   const [direction1, setDirection1] = useState(DIRECTIONS.RIGHT);
   const [score1, setScore1] = useState(0);
-  
-  // Snake 2 state (player 2)
+
   const [snake2, setSnake2] = useState([
     { x: 16, y: 10 },
     { x: 17, y: 10 },
@@ -164,22 +156,17 @@ const Board = () => {
   const [direction2, setDirection2] = useState(DIRECTIONS.LEFT);
   const [score2, setScore2] = useState(0);
   
-  // Food state
   const [food, setFood] = useState({ x: 10, y: 10 });
 
-  // Initialize player ID and position
   useEffect(() => {
     const initializePlayer = async () => {
-      // Get current user ID from client
       const userId = client.userID;
       setPlayerId(userId);
       
-      // Get list of members to determine who is player 1 and player 2
       const { members } = channel.state;
       const memberIds = Object.keys(members);
       setIsPlayer1(memberIds[0] === userId);
       
-      // Set players as ready when both have joined
       setPlayersReady(channel.state.watcher_count === 2);
     };
     
@@ -189,10 +176,8 @@ const Board = () => {
     
   }, [client, channel]);
 
-  // Start countdown when both players join
   useEffect(() => {
     if (playersReady && isPlayer1 && !countdownActive && !gameStarted) {
-      // Player 1 initiates the countdown
       setCountdownActive(true);
       channel.sendEvent({
         type: EVENTS.START_COUNTDOWN,
@@ -201,7 +186,6 @@ const Board = () => {
     }
   }, [playersReady, isPlayer1, countdownActive, gameStarted, channel]);
 
-  // Countdown logic
   useEffect(() => {
     if (!countdownActive) return;
 
@@ -220,11 +204,9 @@ const Board = () => {
     return () => clearInterval(countdownInterval);
   }, [countdownActive]);
 
-  // Set up event listeners for game events
   useEffect(() => {
     if (!channel) return;
     
-    // Handle opponent's move
     const handleOpponentMove = (event) => {
       const { player, snake, direction, score } = event.data;
       
@@ -241,31 +223,26 @@ const Board = () => {
       }
     };
     
-    // Handle food update
     const handleFoodUpdate = (event) => {
       setFood(event.data.food);
     };
     
-    // Handle game over
     const handleGameOver = (event) => {
       setGameOver(true);
       setWinner(event.data.winner);
     };
 
-    // Handle countdown start
     const handleCountdownStart = (event) => {
       if (!isPlayer1) {
         setCountdownActive(true);
       }
     };
     
-    // Listen for game events
     channel.on(EVENTS.MOVE, handleOpponentMove);
     channel.on(EVENTS.FOOD, handleFoodUpdate);
     channel.on(EVENTS.OVER, handleGameOver);
     channel.on(EVENTS.START_COUNTDOWN, handleCountdownStart);
     
-    // Listen for players joining
     channel.on("user.watching.start", (event) => {
       setPlayersReady(event.watcher_count === 2);
     });
@@ -279,14 +256,12 @@ const Board = () => {
     };
   }, [channel, playerId, isPlayer1]);
 
-  // Generate random food position
   const generateFood = useCallback(() => {
     const newFood = {
       x: Math.floor(Math.random() * GRID_SIZE),
       y: Math.floor(Math.random() * GRID_SIZE)
     };
     
-    // Send food update to other player
     if (channel) {
       channel.sendEvent({
         type: EVENTS.FOOD,
@@ -297,17 +272,14 @@ const Board = () => {
     return newFood;
   }, [channel]);
 
-  // Check if position collides with snake
   const checkCollision = (pos, snake) => {
     return snake.some(segment => segment.x === pos.x && segment.y === pos.y);
   };
 
-  // Check if position is out of bounds
   const isOutOfBounds = (pos) => {
     return pos.x < 0 || pos.x >= GRID_SIZE || pos.y < 0 || pos.y >= GRID_SIZE;
   };
 
-  // Move logic for current player
   const moveSnake = useCallback(() => {
     if (gameOver || !gameStarted || !channel) return;
     
@@ -315,18 +287,15 @@ const Board = () => {
     const myDirection = isPlayer1 ? direction1 : direction2;
     const myScore = isPlayer1 ? score1 : score2;
     
-    // Create new head based on current direction
     const head = { ...mySnake[0] };
     head.x += myDirection.x;
     head.y += myDirection.y;
     
-    // Check for collisions with walls or self
     if (
       isOutOfBounds(head) || 
       checkCollision(head, mySnake) ||
       checkCollision(head, isPlayer1 ? snake2 : snake1)
     ) {
-      // Game over
       channel.sendEvent({
         type: EVENTS.OVER,
         data: { winner: isPlayer1 ? 'player2' : 'player1' }
@@ -336,10 +305,8 @@ const Board = () => {
       return;
     }
     
-    // Create new snake array
     const newSnake = [head, ...mySnake];
     
-    // Check if snake ate food
     let newScore = myScore;
     let newFood = food;
     
@@ -348,25 +315,22 @@ const Board = () => {
       newFood = generateFood();
       setFood(newFood);
       
-      // Update score
+
       if (isPlayer1) {
         setScore1(newScore);
       } else {
         setScore2(newScore);
       }
     } else {
-      // Remove tail if no food was eaten
       newSnake.pop();
     }
     
-    // Update snake
     if (isPlayer1) {
       setSnake1(newSnake);
     } else {
       setSnake2(newSnake);
     }
     
-    // Send move to other player
     channel.sendEvent({
       type: EVENTS.MOVE,
       data: {
@@ -383,7 +347,6 @@ const Board = () => {
     score1, score2, food, playerId, channel, generateFood
   ]);
 
-  // Game loop
   useEffect(() => {
     if (!gameStarted || gameOver) return;
     
@@ -394,12 +357,10 @@ const Board = () => {
     return () => clearInterval(gameInterval);
   }, [gameStarted, gameOver, moveSnake]);
 
-  // Handle keyboard input
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (!gameStarted || gameOver) return;
       
-      // Only control your own snake
       const currentDirection = isPlayer1 ? direction1 : direction2;
       let newDirection = currentDirection;
       
@@ -428,7 +389,6 @@ const Board = () => {
           return;
       }
       
-      // Update direction
       if (isPlayer1) {
         setDirection1(newDirection);
       } else {
@@ -440,11 +400,9 @@ const Board = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [gameStarted, gameOver, isPlayer1, direction1, direction2]);
 
-  // Render game grid
   const renderGrid = () => {
     const cells = [];
     
-    // Create grid cells
     for (let y = 0; y < GRID_SIZE; y++) {
       for (let x = 0; x < GRID_SIZE; x++) {
         const pos = { x, y };
@@ -454,7 +412,6 @@ const Board = () => {
         const isSnake2Head = snake2[0].x === x && snake2[0].y === y;
         const isFoodCell = food.x === x && food.y === y;
         
-        // Combine styles based on cell type
         const cellStyle = {
           ...styles.cell,
           width: CELL_SIZE,
@@ -481,11 +438,9 @@ const Board = () => {
     return cells;
   };
 
-  // Combine styles for player scores
   const player1ScoreStyle = { ...styles.score, ...styles.player1 };
   const player2ScoreStyle = { ...styles.score, ...styles.player2 };
 
-  // If no channel is available yet
   if (!channel) {
     return <div style={styles.waiting}>Loading game...</div>;
   }
