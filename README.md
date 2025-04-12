@@ -3,6 +3,15 @@ This project will build a multiplayer snake game where players can chat between 
 ### Tech Stack: 
 - frontend - React
 - backend - Nodejs and Express
+### Features
+- Players can sign up and log in securely.
+- After logging in, a player can enter the username of another player they want to play with.
+- The game waits until both players are online.
+- Once both are ready, the game starts with a countdown.
+- Players can chat with each other during the game in real-time.
+- Players can log out at any time.
+
+
 
 ![image](https://github.com/user-attachments/assets/2077cd9b-7ca9-47cb-be43-e6b3667a4755)
 
